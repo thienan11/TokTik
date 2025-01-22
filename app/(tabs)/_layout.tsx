@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { View } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TabLayout() {
   return (
@@ -16,35 +17,38 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: () => <Text>Home</Text>,
+          tabBarIcon: ({ focused }) => <Ionicons name={focused ? "home-sharp" : "home-outline" } size={24} color="black" />,
         }}
       />
       <Tabs.Screen
         name="friends"
         options={{
           title: 'Friends',
-          tabBarIcon: () => <Text>Friends</Text>,
+          tabBarIcon: ({ focused }) => <Ionicons name={focused ? "people-sharp" : "people-outline"} size={24} color="black" />,
         }}
       />
       <Tabs.Screen
         name="camera"
         options={{
-          title: 'Camera',
-          tabBarIcon: () => <Text>Camera</Text>,
+          title: '',
+          tabBarIcon: () =>
+          <View className="absolute">
+            <Ionicons name="add-circle" size={75} color="black" />
+          </View>,
         }}
       />
       <Tabs.Screen
         name="inbox"
         options={{
           title: 'Inbox',
-          tabBarIcon: () => <Text>Inbox</Text>,
+          tabBarIcon: ({ focused }) => <Ionicons name={focused ? "chatbox-ellipses-sharp" : "chatbox-ellipses-outline"} size={24} color="black" />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: () => <Text>Profile</Text>,
+          tabBarIcon: ({ focused }) => <Ionicons name={focused ? "person-sharp" : "person-outline"} size={24} color="black" />,
         }}
       />
     </Tabs>
