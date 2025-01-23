@@ -8,10 +8,10 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: "#000", 
         headerShown: false,
-        tabBarIconStyle: {
-          width: 'auto',  // Allow text to take necessary width
-          height: 24,     // Set consistent height
-        },
+        // tabBarIconStyle: {
+        //   width: 'auto',  // Allow text to take necessary width
+        //   height: 24,     // Set consistent height
+        // },
       }}>
       <Tabs.Screen
         name="index"
@@ -32,9 +32,10 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarIcon: () =>
-          <View className="absolute">
-            <Ionicons name="add-circle" size={75} color="black" />
-          </View>,
+          // <View className="absolute">
+          //   <Ionicons name="add-circle" size={75} color="black" />
+          // </View>,
+          <Ionicons name="add-circle" size={75} color="black" style={{width:75, height:75}} />
         }}
       />
       <Tabs.Screen
