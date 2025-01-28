@@ -1,23 +1,14 @@
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { supabase } from "@/utils/supabase"
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function () {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-    if (error) return console.error(error);
-    router.push("/(tabs)");
-    console.log("Login Successful!");
-  };
+  const { signIn } = useAuth();
 
   return (
     <View className="flex-1 items-center justify-center bg-white">
@@ -40,7 +31,7 @@ export default function () {
         />
         <TouchableOpacity
           className="bg-black px-8 py-4 rounded-lg"
-          onPress={handleLogin}
+          onPress={() => signIn(email, password)}
         >
           <Text className="text-white font-bold text-lg text-center">Login</Text>
         </TouchableOpacity>
