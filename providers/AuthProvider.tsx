@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { useRouter } from "expo-router";
 
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
     if (userError) return console.error(userError);
     getUser(data?.user?.id);
-    router.back(); // dismiss signup modal first before redirecting to tabs
+    router.back(); // dismiss signup modal first before redirecting to home
     router.push("/(tabs)");
   };
 
@@ -62,6 +62,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null); // reset current user
     router.push("/(auth)");
   };
+
+  // Runs when AuthProvider mounts, get user id from session token (if exists) and call getUser(), redirecting you to home
+  useEffect(() => {
+    const { data: authData } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (!session) return router.push("/(auth)"); // go to auth page if session expired
+
+        getUser(session?.user?.id);
+      }
+    );
+
+    return () => {
+      authData.subscription.unsubscribe(); // cleanup the subscription on unmount
+    };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, signIn, signUp, signOut }}>
