@@ -1,10 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useState, useRef } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Text, TouchableOpacity, View, Dimensions } from 'react-native';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/providers/AuthProvider';
 import { useRouter } from 'expo-router';
+import { useEvent } from 'expo';
+import * as ImagePicker from 'expo-image-picker';
+import { useVideoPlayer, VideoView } from 'expo-video';
 
 export default function Camera() {
   const { user } = useAuth();
@@ -14,6 +17,12 @@ export default function Camera() {
   const [permission, requestPermission] = useCameraPermissions();
   const [isRecording, setIsRecording] = useState(false);
   const [videoUri, setVideoUri] = useState<string | null>(null);
+  const player = useVideoPlayer(videoUri, player => {
+    player.loop = true;
+    player.play();
+  });
+  const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
+
   const cameraRef = useRef<CameraView>(null);
 
   if (!permission) {
@@ -24,8 +33,8 @@ export default function Camera() {
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-center pb-[10px]">We need your permission to show the camera</Text>
         <Button onPress={requestPermission} title="grant permission" />
       </View>
     );
@@ -75,62 +84,73 @@ export default function Camera() {
     router.back();
   }
 
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library (limited/private access only)
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images', 'videos'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.1,
+    });
+
+    console.log(result);
+    setVideoUri(result.assets[0].uri);
+  };
+
   return (
-    // <View style={styles.container}>
-    <CameraView mode="video" ref={cameraRef} style={{ flex: 1 }} facing={facing}>
-      <View className="flex-1 justify-end">
-        <View className="flex-row items-center justify-around mb-10">
-          <TouchableOpacity className="items-end justify-end" onPress={toggleCameraFacing}>
-            <Ionicons name="camera-reverse" size={50} color="transparent"></Ionicons>
-          </TouchableOpacity>
-
-          {/* If there is a videoUri, show save video instead of record button */}
-          {videoUri ? (
-            <TouchableOpacity className="items-end justify-end" onPress={saveVideo}>
-              <Ionicons name="checkmark-circle" size={100} color="white" />
-            </TouchableOpacity>  
-          ) : (
-            <TouchableOpacity className="items-end justify-end" onPress={recordVideo}>
-              { !isRecording ? <Ionicons name="radio-button-on" size={100} color="white" /> : <Ionicons name="pause-circle" size={100} color="red" /> }
-            </TouchableOpacity>  
-          )}
-
-          <TouchableOpacity className="items-end justify-end" onPress={toggleCameraFacing}>
-            <Ionicons name="camera-reverse" size={50} color="white"></Ionicons>
-          </TouchableOpacity>
+    <View className="flex-1">
+      {videoUri ? (
+        <View className="flex-1">
+          <TouchableOpacity className="absolute bottom-10 left-44 z-10" onPress={saveVideo}>
+            <Ionicons name="checkmark-circle" size={100} color="white" />
+          </TouchableOpacity>  
+          {/* <TouchableOpacity className="flex-1"
+            onPress={() => {
+              if (isPlaying) {
+                player.pause();
+              } else {
+                  player.play();
+                }
+              }}> */}
+          <VideoView
+            style={{
+              flex: 1,
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height
+            }}
+            player={player}
+            allowsFullscreen
+            allowsPictureInPicture 
+            contentFit='cover'
+          />
+          {/* </TouchableOpacity> */}
         </View>
-      </View>
-    </CameraView>
-    // </View>
+      ) : 
+        <CameraView mode="video" ref={cameraRef} style={{ flex: 1 }} facing={facing} ratio="4:3">
+          <View className="flex-1 justify-end">
+            <View className="flex-row items-center justify-around mb-10">
+              <TouchableOpacity className="items-end justify-end" onPress={pickImage}>
+                <Ionicons name="images" size={50} color="white"></Ionicons>
+              </TouchableOpacity>
+
+              {/* If there is a videoUri, show save video instead of record button */}
+              {videoUri ? (
+                <TouchableOpacity className="items-end justify-end" onPress={saveVideo}>
+                  <Ionicons name="checkmark-circle" size={100} color="white" />
+                </TouchableOpacity>  
+              ) : (
+                <TouchableOpacity className="items-end justify-end" onPress={recordVideo}>
+                  { !isRecording ? <Ionicons name="radio-button-on" size={100} color="white" /> : <Ionicons name="pause-circle" size={100} color="red" /> }
+                </TouchableOpacity>  
+              )}
+
+              <TouchableOpacity className="items-end justify-end" onPress={toggleCameraFacing}>
+                <Ionicons name="camera-reverse" size={50} color="white"></Ionicons>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </CameraView>
+      }
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  message: {
-    textAlign: 'center',
-    paddingBottom: 10,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: 'transparent',
-    margin: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-});
