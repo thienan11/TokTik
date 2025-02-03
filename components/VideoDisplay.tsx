@@ -10,6 +10,7 @@ interface User {
 }
 
 interface VideoItem {
+  id: string;
   signedUrl: string;
   title: string;
   User: User;
@@ -71,7 +72,7 @@ export default function VideoDisplay({
             <TouchableOpacity className="mt-6" onPress={() => console.log("Liked video")}>
               <Ionicons name="heart" size={40} color="white"/>
             </TouchableOpacity>
-            <TouchableOpacity className="mt-6" onPress={() => router.push('/comment')}>
+            <TouchableOpacity className="mt-6" onPress={() => router.push(`/comment?video_id=${videoItem.id}`)}>
               <Ionicons name="chatbubble-ellipses" size={40} color="white"/>
             </TouchableOpacity>
             <TouchableOpacity className="mt-6" onPress={shareVideo}>
