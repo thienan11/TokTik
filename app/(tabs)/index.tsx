@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { View, FlatList, Dimensions } from "react-native";
 import { supabase } from "@/utils/supabase";
 import VideoDisplay from "@/components/VideoDisplay";
+import Header from "@/components/Header";
 
 export default function HomeScreen() {
   const [videos, setVideos] = useState<any[]>([]);
@@ -14,7 +15,7 @@ export default function HomeScreen() {
   const getVideos = async () => {
     const { data, error } = await supabase
       .from("Video")
-      .select("*, User(username)")
+      .select("*, User(username, id)")
       .order("created_at", { ascending: false });
 
     getSignedUrls(data);
@@ -54,6 +55,9 @@ export default function HomeScreen() {
 
   return (
     <View className="flex-1 items-center justify-center bg-white">
+      <View className="absolute top-16 left-0 right-0 z-10">
+        <Header title="For You" color="white" />
+      </View>
       <FlatList
         data={videos}
         snapToInterval={Dimensions.get("window").height}
