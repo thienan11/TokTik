@@ -3,6 +3,8 @@ import { Dimensions, Text, View, TouchableOpacity, Share } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { supabase } from "@/utils/supabase";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface User {
   username: string;
@@ -23,6 +25,7 @@ export default function VideoDisplay({
   videoItem: VideoItem;
   isViewable: boolean;
 }) {
+  const { user, likes, getLikes } = useAuth();
   const router = useRouter();
 
   if (!videoItem) return null;
@@ -45,6 +48,27 @@ export default function VideoDisplay({
       message: `Check out this video: ${videoItem.title}`
     })
   };
+
+  const likeVideo = async () => {
+    const { data, error } = await supabase
+      .from("Like")
+      .insert({
+        user_id: user?.id,
+        video_id: videoItem.id,
+        video_user_id: videoItem.User.id
+      });
+    if (!error) getLikes(user?.id);
+    // console.log(videoItem);
+  }
+
+  const unlikeVideo = async () => {
+    const { data, error } = await supabase
+      .from("Like")
+      .delete()
+      .eq("user_id", user?.id)
+      .eq("video_id", videoItem.id);
+    if (!error) getLikes(user?.id);
+  }
 
   return (
     <View>
@@ -69,9 +93,15 @@ export default function VideoDisplay({
             <TouchableOpacity onPress={() => router.push(`/user?user_id=${videoItem.User.id}`)}>
               <Ionicons name="person" size={40} color="white" />
             </TouchableOpacity>
-            <TouchableOpacity className="mt-6" onPress={() => console.log("Liked video")}>
-              <Ionicons name="heart" size={40} color="white"/>
-            </TouchableOpacity>
+            {likes.filter((like: any) => like.video_id === videoItem.id).length > 0 ? (
+              <TouchableOpacity className="mt-6" onPress={unlikeVideo}>
+                <Ionicons name="heart" size={40} color="red" />
+              </TouchableOpacity>
+            ): (
+              <TouchableOpacity className="mt-6" onPress={likeVideo}>
+                <Ionicons name="heart" size={40} color="white" />
+              </TouchableOpacity>
+            )}
             <TouchableOpacity className="mt-6" onPress={() => router.push(`/comment?video_id=${videoItem.id}`)}>
               <Ionicons name="chatbubble-ellipses" size={40} color="white"/>
             </TouchableOpacity>

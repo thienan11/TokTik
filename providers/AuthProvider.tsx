@@ -7,6 +7,8 @@ export const AuthContext = createContext({
   signIn: async (email: string, password: string) => {},
   signUp: async (username: string, email: string, password: string) => {},
   signOut: async () => {},
+  likes: [],
+  getLikes: async (userId: string) => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -14,6 +16,18 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState(null);
   const router = useRouter();
+  const [likes, setLikes] = useState([]);
+
+  const getLikes = async (userId: string) => {
+    // console.log("userId", userId);
+    if (!userId) return;
+    const { data, error } = await supabase
+      .from("Like")
+      .select("*")
+      .eq("user_id", userId);
+    setLikes(data);
+    console.log("Likes:", data);
+  }
 
   const getUser = async (id: string) => {
     const { data, error } = await supabase
@@ -24,7 +38,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (error) return console.error(error);
 
     setUser(data); // if successful, set the user from the data
-    console.log(data);
+    // console.log(data);
+    getLikes(data.id);
     router.push("/(tabs)");
   };
 
@@ -79,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, signIn, signUp, signOut, likes, getLikes }}>
       {children}
     </AuthContext.Provider>
   );
