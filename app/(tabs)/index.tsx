@@ -56,7 +56,7 @@ export default function HomeScreen() {
   return (
     <View className="flex-1 items-center justify-center bg-white">
       <View className="absolute top-16 left-0 right-0 z-10">
-        <Header title="For You" color="white" />
+        <Header title="For You" color="white" search/>
       </View>
       <FlatList
         data={videos}
