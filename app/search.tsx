@@ -11,10 +11,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { supabase } from "@/utils/supabase";
+import { useRouter } from "expo-router";
 
 export default function () {
   const [text, setText] = useState("");
   const [results, setResults] = useState([]);
+  const router = useRouter();
 
   const search = async () => {
     const { data, error } = await supabase
@@ -45,15 +47,17 @@ export default function () {
         data={results}
         renderItem={({ item: user }) => {
           return (
-            <View className="flex-row gap-2 items-center w-full m-3">
-              <Image
-                source={{ uri: "https://placehold.co/40x40" }}
-                className="w-10 h-10 rounded-full bg-black"
-              />
-              <View>
-                <Text className="font-bold text-base">{user.username}</Text>
+            <TouchableOpacity onPress={() => router.push(`/user?user_id=${user.id}`)}>
+              <View className="flex-row gap-2 items-center w-full m-3">
+                <Image
+                  source={{ uri: "https://placehold.co/40x40" }}
+                  className="w-10 h-10 rounded-full bg-black"
+                />
+                <View>
+                  <Text className="font-bold text-base">{user.username}</Text>
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />

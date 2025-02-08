@@ -66,6 +66,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(data); // if successful, set the user from the data
     // console.log(data);
     getLikes(data.id);
+    getFollowing(data.id);
+    getFollowers(data.id);
     router.push("/(tabs)");
   };
 
