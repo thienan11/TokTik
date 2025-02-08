@@ -9,6 +9,10 @@ export const AuthContext = createContext({
   signOut: async () => {},
   likes: [],
   getLikes: async (userId: string) => {},
+  following: [],
+  getFollowing: async (userId: string) => {},
+  followers: [],
+  getFollowers: async (userId: string) => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -17,6 +21,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState(null);
   const router = useRouter();
   const [likes, setLikes] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [followers, setFollowers] = useState([]);
 
   const getLikes = async (userId: string) => {
     // console.log("userId", userId);
@@ -27,7 +33,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .eq("user_id", userId);
     setLikes(data);
     console.log("Likes:", data);
-  }
+  };
+
+  const getFollowing = async (userId: string) => {
+    if (!userId) return;
+    const { data, error } = await supabase
+      .from("Follower")
+      .select("*")
+      .eq("user_id", userId);
+    if (!error) setFollowing(data);
+    console.log("Following:", data);
+  };
+
+  const getFollowers = async (userId: string) => {
+    if (!userId) return;
+    const { data, error } = await supabase
+      .from("Follower")
+      .select("*")
+      .eq("follower_user_id", userId);
+    if (!error) setFollowers(data);
+    console.log("Followers:", data);
+  };
 
   const getUser = async (id: string) => {
     const { data, error } = await supabase
@@ -94,7 +120,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signUp, signOut, likes, getLikes }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        signIn,
+        signUp,
+        signOut,
+        likes,
+        getLikes,
+        following,
+        getFollowing,
+        followers,
+        getFollowers,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
