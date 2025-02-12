@@ -6,6 +6,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
+import { supabase } from "@/utils/supabase";
 
 export default function ({
   user,
@@ -16,7 +17,12 @@ export default function ({
   following: any;
   followers: any;
 }) {
-  const { user: authUser, signOut } = useAuth();
+  const {
+    user: authUser,
+    signOut,
+    following: myFollowing,
+    getFollowing,
+  } = useAuth();
 
   const addProfilePic = async () => {
     console.log("adding pic...");
@@ -26,6 +32,23 @@ export default function ({
     //     cacheControl: "3600",
     //     upsert: false,
     //   });
+  };
+
+  const followerUser = async () => {
+    const { error } = await supabase.from("Follower").insert({
+      user_id: authUser?.id, // we are taking the action so we want OUR user id
+      follower_user_id: user?.id,
+    });
+    if (!error) getFollowing(authUser?.id);
+  };
+
+  const unFollowerUser = async () => {
+    const { error } = await supabase
+      .from("Follower")
+      .delete()
+      .eq("user_id", authUser?.id)
+      .eq("follower_user_id", user?.id);
+    if (!error) getFollowing(authUser?.id);
   };
 
   return (
@@ -51,13 +74,38 @@ export default function ({
           <Text className="text-xl ">1000</Text>
         </View>
       </View>
-      {authUser?.id === user?.id && (
+      {authUser?.id === user?.id ? (
         <TouchableOpacity
-          className="bg-black px-4 py-2 rounded-lg"
+          className="bg-black px-4 py-2 rounded-lg m-3"
           onPress={signOut}
         >
-          <Text className="text-white font-bold text-lg">Sign Out</Text>
+          <Text className="text-white font-bold text-lg text-center">
+            Sign Out
+          </Text>
         </TouchableOpacity>
+      ) : (
+        <View>
+          {myFollowing.filter((u: any) => u.follower_user_id === user?.id)
+            .length > 0 ? (
+            <TouchableOpacity
+              className="bg-black px-4 py-2 rounded-lg w-full m-3"
+              onPress={unFollowerUser}
+            >
+              <Text className="text-white font-bold text-lg text-center">
+                Unfollow
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              className="bg-black px-4 py-2 rounded-lg w-full m-3"
+              onPress={followerUser}
+            >
+              <Text className="text-white font-bold text-lg text-center">
+                Follow
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
     </SafeAreaView>
   );
