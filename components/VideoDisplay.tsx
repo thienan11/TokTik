@@ -136,7 +136,7 @@ export default function VideoDisplay({
                 <Ionicons name="heart" size={40} color="white" />
               </TouchableOpacity>
             )}
-            <TouchableOpacity className="mt-6" onPress={() => router.push(`/comment?video_id=${videoItem.id}`)}>
+            <TouchableOpacity className="mt-6" onPress={() => router.push(`/comment?video_id=${videoItem.id}&video_user_id=${videoItem.User.id}`)}>
               <Ionicons name="chatbubble-ellipses" size={40} color="white"/>
             </TouchableOpacity>
             <TouchableOpacity className="mt-6" onPress={shareVideo}>

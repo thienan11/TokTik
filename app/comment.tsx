@@ -41,7 +41,7 @@ export default function () {
       user_id: user.id,
       video_id: params.video_id,
       text,
-      // video_user_id: "test"
+      video_user_id: params.video_user_id
     });
     if (error) return console.log(error);
     setText(""); // clear prev comment after successful insert
