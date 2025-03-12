@@ -68,7 +68,7 @@ export default function Camera() {
 
     // push form to Supabase
     const { data, error } = await supabase.storage
-      .from('videos')
+      .from(`videos/${user?.id}`) // videos in a user id folder
       .upload(fileName, formData, {
         cacheControl: '3600000000', // won't be changed much once uploaded; want to cache it for a long period of time (save on storage cost)
         upsert: false
@@ -77,7 +77,7 @@ export default function Camera() {
 
     const { error: videoError } = await supabase.from('Video').insert({
       title: "Test title here!!",
-      uri: data.path,
+      uri: `${user?.id}/${fileName}`,
       user_id: user?.id
     });
     if (videoError) console.error(videoError);
