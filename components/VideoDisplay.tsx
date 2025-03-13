@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Dimensions, Text, View, TouchableOpacity, Share } from "react-native";
+import { Dimensions, Text, View, TouchableOpacity, Share, Image } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -113,7 +113,15 @@ export default function VideoDisplay({
           <View>
             <View>
               <TouchableOpacity onPress={() => router.push(`/user?user_id=${videoItem.User.id}`)}>
-                <Ionicons name="person" size={40} color="white" />
+                {/* <Ionicons name="person" size={40} color="white" /> */}
+                <Image
+                    source={{
+                      uri:
+                        `${process.env.EXPO_PUBLIC_BUCKET}/avatars/${videoItem.User?.id}/avatar` ||
+                        "https://placehold.co/40x40",
+                    }}
+                    className="w-12 h-12 rounded-full bg-black"
+                  />
               </TouchableOpacity>
               {!isOwnProfile && (
                 following.filter((following: any) => following.follower_user_id === videoItem.User.id).length > 0 ? (

@@ -50,7 +50,7 @@ export default function () {
             <TouchableOpacity onPress={() => router.push(`/user?user_id=${user.id}`)}>
               <View className="flex-row gap-2 items-center w-full m-3">
                 <Image
-                  source={{ uri: "https://placehold.co/40x40" }}
+                  source={{ uri: `${process.env.EXPO_PUBLIC_BUCKET}/avatars/${user?.id}/avatar` || "https://placehold.co/40x40" }}
                   className="w-10 h-10 rounded-full bg-black"
                 />
                 <View>

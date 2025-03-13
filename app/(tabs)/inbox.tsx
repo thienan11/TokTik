@@ -71,7 +71,7 @@ export default function () {
         <FlatList
           data={users}
           keyExtractor={(item) => item.id.toString()}
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => router.push(`/chat?chat_user_id=${item.id}`)}
@@ -80,13 +80,15 @@ export default function () {
               <View className="flex-row justify-between w-full items-center pr-7">
                 <View className="flex-row gap-2 m-2">
                   <Image
-                    source={{ uri: "https://placehold.co/40x40" }}
+                    source={{
+                      uri:
+                        `${process.env.EXPO_PUBLIC_BUCKET}/avatars/${item?.id}/avatar` ||
+                        "https://placehold.co/40x40",
+                    }}
                     className="w-12 h-12 rounded-full bg-black"
                   />
                   <View>
-                    <Text className="font-bold text-base">
-                      {item.username}
-                    </Text>
+                    <Text className="font-bold text-base">{item.username}</Text>
                     <Text>Say hi</Text>
                   </View>
                 </View>
@@ -94,7 +96,7 @@ export default function () {
               </View>
             </TouchableOpacity>
           )}
-          />
+        />
       </View>
     </SafeAreaView>
   );
