@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/utils/supabase";
+import { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
 
 export default function ({
   user,
@@ -22,16 +24,51 @@ export default function ({
     signOut,
     following: myFollowing,
     getFollowing,
+    avatarUrl,
+    fetchUserAvatar,
   } = useAuth();
+  const [profilePic, setProfilePic] = useState<string>("");
 
-  const addProfilePic = async () => {
-    console.log("adding pic...");
-    // const { data, error } = await supabase.storage
-    //   .from("profile")
-    //   .upload(user?.id, {
-    //     cacheControl: "3600",
-    //     upsert: false,
-    //   });
+  const pickImage = async () => {
+    if (authUser?.id !== user?.id) return; // if user is not you, they can't update your profile pic
+
+    // No permissions request is necessary for launching the image library (limited/private access only)
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: "images",
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.1,
+    });
+
+    console.log(result);
+    setProfilePic(result.assets[0].uri);
+    saveImage(result.assets[0].uri);
+  };
+
+  const saveImage = async (uri: string) => {
+    const formData = new FormData();
+    const fileName = uri?.split("/").pop();
+    const extension = fileName?.split(".").pop();
+    formData.append("file", {
+      type: `image/${extension}`,
+      name: `avatar.${extension}`,
+      uri,
+    });
+
+    // push form to Supabase
+    const { data, error } = await supabase.storage
+      .from(`avatars/${user?.id}`)
+      .upload(`avatar.${extension}`, formData, {
+        cacheControl: "3600000000", // won't be changed much once uploaded; want to cache it for a long period of time (save on storage cost)
+        upsert: true, // overwrite old with new
+      });
+    if (error) {
+      console.error(error);
+      return; // Exit if there's an error
+    }
+
+    // Fetch the updated avatar URL after successfully saving the image
+    // await fetchUserAvatar(user?.id);
   };
 
   const followerUser = async () => {
@@ -53,9 +90,11 @@ export default function ({
 
   return (
     <SafeAreaView className="flex-1 items-center">
-      <TouchableOpacity onPress={addProfilePic}>
+      <TouchableOpacity onPress={pickImage}>
         <Image
-          source={{ uri: "https://placehold.co/40x40" }}
+          source={{
+            uri: profilePic || avatarUrl || "https://placeholder.com/40x40",
+          }}
           className="w-20 h-20 rounded-full bg-black"
         />
       </TouchableOpacity>

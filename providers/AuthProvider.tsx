@@ -15,6 +15,8 @@ export const AuthContext = createContext({
   getFollowers: async (userId: string) => {},
   friends: [],
   getFriends: async () => {},
+  avatarUrl: "",
+  fetchUserAvatar: async (userId: string) => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -26,6 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [following, setFollowing] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [friends, setFriends] = useState([]);
+  const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
     getFriends();
@@ -71,6 +74,58 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("Followers:", data);
   };
 
+  const fetchUserAvatar = async (userId: string) => {
+    if (!userId) return;
+
+    try {
+      // List all files in the user's avatar directory
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .list(`${userId}`);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        // Find files that start with "avatar."
+        const avatarFiles = data.filter((file) =>
+          file.name.startsWith("avatar.")
+        );
+
+        if (avatarFiles.length > 0) {
+          // Sort by created_at or last_modified if available (newest first)
+          avatarFiles.sort(
+            (a, b) =>
+              new Date(b.created_at || b.last_modified || 0).getTime() -
+              new Date(a.created_at || a.last_modified || 0).getTime()
+          );
+
+          // Get the latest avatar file
+          const latestAvatar = avatarFiles[0];
+
+          // Create a public URL for the avatar
+          // const { data: publicUrlData } = supabase.storage
+          //   .from("avatars")
+          //   .getPublicUrl(`${userId}/${latestAvatar.name}`);
+
+          // setAvatarUrl(publicUrlData.publicUrl);
+          const publicAvatarUrl = `${process.env.EXPO_PUBLIC_BUCKET}/avatars/${userId}/${latestAvatar.name}`;
+          setAvatarUrl(publicAvatarUrl);
+          // return publicUrlData.publicUrl;
+          // return publicAvatarUrl;
+          return;
+        }
+      }
+
+      // If no avatar found, return null or a default
+      setAvatarUrl("");
+      // return "";
+    } catch (error) {
+      console.error("Error fetching avatar:", error);
+      setAvatarUrl("");
+      // return "";
+    }
+  };
+
   const getUser = async (id: string) => {
     const { data, error } = await supabase
       .from("User")
@@ -84,6 +139,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     getLikes(data.id);
     getFollowing(data.id);
     getFollowers(data.id);
+    fetchUserAvatar(data.id);
     router.push("/(tabs)");
   };
 
@@ -152,6 +208,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         getFollowers,
         friends,
         getFriends,
+        avatarUrl,
+        fetchUserAvatar,
       }}
     >
       {children}
