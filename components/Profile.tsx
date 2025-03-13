@@ -24,10 +24,22 @@ export default function ({
     signOut,
     following: myFollowing,
     getFollowing,
-    avatarUrl,
-    fetchUserAvatar,
   } = useAuth();
   const [profilePic, setProfilePic] = useState<string>("");
+
+  // useEffect(() => {
+  //   const loadAvatar = async () => {
+  //     if (user?.id) {
+  //       const fetchedAvatarUrl = await getUserAvatar(user?.id);
+  //       setProfilePic(fetchedAvatarUrl);
+  //     } else if (user?.id) {
+  //       // If no userId is provided, use the current user's avatarUrl
+  //       setProfilePic(avatarUrl);
+  //     }
+  //   };
+
+  //   loadAvatar();
+  // }, [user?.id, avatarUrl, getUserAvatar]);
 
   const pickImage = async () => {
     if (authUser?.id !== user?.id) return; // if user is not you, they can't update your profile pic
@@ -51,24 +63,21 @@ export default function ({
     const extension = fileName?.split(".").pop();
     formData.append("file", {
       type: `image/${extension}`,
-      name: `avatar.${extension}`,
+      name: "avatar",
       uri,
     });
 
     // push form to Supabase
     const { data, error } = await supabase.storage
       .from(`avatars/${user?.id}`)
-      .upload(`avatar.${extension}`, formData, {
-        cacheControl: "3600000000", // won't be changed much once uploaded; want to cache it for a long period of time (save on storage cost)
+      .upload("avatar", formData, {
+        cacheControl: "3600", // Cache for 1 hour
         upsert: true, // overwrite old with new
       });
     if (error) {
       console.error(error);
       return; // Exit if there's an error
     }
-
-    // Fetch the updated avatar URL after successfully saving the image
-    // await fetchUserAvatar(user?.id);
   };
 
   const followerUser = async () => {
@@ -88,13 +97,18 @@ export default function ({
     if (!error) getFollowing(authUser?.id);
   };
 
+  const getProfilePic = () => {
+    if (profilePic) return profilePic;
+    if (user?.id)
+      return `${process.env.EXPO_PUBLIC_BUCKET}/avatars/${user.id}/avatar`;
+    return "https://placehold.co/40x40"; // Default placeholder
+  };
+
   return (
     <SafeAreaView className="flex-1 items-center">
       <TouchableOpacity onPress={pickImage}>
         <Image
-          source={{
-            uri: profilePic || avatarUrl || "https://placeholder.com/40x40",
-          }}
+          source={{ uri: getProfilePic() }}
           className="w-20 h-20 rounded-full bg-black"
         />
       </TouchableOpacity>
