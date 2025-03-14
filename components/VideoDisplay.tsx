@@ -5,7 +5,6 @@ import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/providers/AuthProvider";
-import { useIsFocused } from "@react-navigation/native";
 
 interface User {
   username: string;
@@ -28,7 +27,6 @@ export default function VideoDisplay({
 }) {
   const { user, likes, getLikes, following, getFollowing } = useAuth();
   const router = useRouter();
-  const isFocused = useIsFocused();
 
   if (!videoItem) return null;
 
@@ -38,13 +36,12 @@ export default function VideoDisplay({
   });
 
   useEffect(() => {
-    // Only play if the video is viewable AND the screen is focused
-    if (isViewable && isFocused) {
+    if (isViewable) {
       player.play();
     } else {
       player.pause();
     }
-  }, [isViewable, isFocused]);
+  }, [isViewable]);
 
   const shareVideo = () => {
     Share.share({

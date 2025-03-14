@@ -5,11 +5,13 @@ import VideoDisplay from "@/components/VideoDisplay";
 import Header from "@/components/Header";
 import { useAuth } from "@/providers/AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function () {
   const { friends } = useAuth();
   const [videos, setVideos] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     getVideos();
@@ -71,7 +73,10 @@ export default function () {
         viewabilityConfig={viewabilityConfig}
         onViewableItemsChanged={onViewableItemsChanged}
         renderItem={({ item }) => (
-          <VideoDisplay videoItem={item} isViewable={activeIndex === item.id} />
+          <VideoDisplay
+            videoItem={item}
+            isViewable={activeIndex === item.id && isFocused}
+          />
         )}
         ListEmptyComponent={
           <SafeAreaView className="flex-1 mt-72 items-center justify-center bg-black">

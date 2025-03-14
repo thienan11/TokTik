@@ -3,10 +3,12 @@ import { View, FlatList, Dimensions } from "react-native";
 import { supabase } from "@/utils/supabase";
 import VideoDisplay from "@/components/VideoDisplay";
 import Header from "@/components/Header";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function HomeScreen() {
   const [videos, setVideos] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     getVideos();
@@ -56,7 +58,7 @@ export default function HomeScreen() {
   return (
     <View className="flex-1 items-center justify-center bg-white">
       <View className="absolute top-16 left-0 right-0 z-10">
-        <Header title="For You" color="white" search/>
+        <Header title="For You" color="white" search />
       </View>
       <FlatList
         data={videos}
@@ -67,7 +69,10 @@ export default function HomeScreen() {
         viewabilityConfig={viewabilityConfig}
         onViewableItemsChanged={onViewableItemsChanged}
         renderItem={({ item }) => (
-          <VideoDisplay videoItem={item} isViewable={activeIndex === item.id} />
+          <VideoDisplay
+            videoItem={item}
+            isViewable={activeIndex === item.id && isFocused}
+          />
         )}
       />
     </View>
