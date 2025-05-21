@@ -1,20 +1,51 @@
-# Welcome to your Expo app 👋
+<div align="center" style="text-align: center;">
+  <div>
+    <img src="assets/images/icon.png" alt="PodFast Logo" width="100" height="100" style="margin: 0; padding: 0;" />
+  </div>
+  <h3 style="margin: 0; padding: 0;">TokTik</h3>
+  <p style="margin-top: 8px;">
+    Short videos, big impact.
+  </p>
+</div>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+---
+
+## About
+
+A sleek and fun TikTok clone that lets you scroll, create, and share short videos effortlessly.
+
+### Built With
+
+- [![expo][expo]][expo-url]
+- [![reactnative][reactnative]][reactnative-url]
+- [![nativewind][nativewind]][nativewind-url]
+- [![typescript][typescript]][typescript-url]
+- [![supabase][supabase]][supabase-url]
 
 ## Get started
 
-1. Install dependencies
+To get a local copy up and running follow these simple steps.
 
-   ```bash
-   npm install
-   ```
+1.  Clone the repo and go into the project directory
 
-2. Start the app
+    ```sh
+    git clone https://github.com/thienan11/TokTik.git
+    cd TokTik
+    ```
 
-   ```bash
-    npx expo start
-   ```
+2.  Install dependencies
+
+    ```bash
+    npm install
+    ```
+
+3.  Start the app
+
+    ```bash
+     npx expo start
+    ```
+
+Make sure to make a copy of the `.env.example` file with your own variables.
 
 In the output, you'll find options to open the app in a
 
@@ -23,28 +54,13 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+[typescript]: https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white
+[typescript-url]: https://www.typescriptlang.org/
+[reactnative]: https://img.shields.io/badge/React_Native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB
+[reactnative-url]: https://reactnative.dev/
+[nativewind]: https://img.shields.io/badge/NativeWind-0078B5?style=for-the-badge&logo=tailwindcss&logoColor=white
+[nativewind-url]: https://www.nativewind.dev/
+[expo]: https://img.shields.io/badge/Expo-1C2024.svg?style=for-the-badge&logo=expo&logoColor=fff
+[expo-url]: https://expo.dev/
+[supabase]: https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=fff&style=for-the-badge
+[supabase-url]: https://supabase.com/
